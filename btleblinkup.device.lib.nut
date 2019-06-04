@@ -87,7 +87,7 @@ class BTLEBlinkUp {
      */
     constructor(uuids = null, firmware = null, lpoPin = null, regonPin = null, uart = null) {
         // Check that we have recieved firmware
-        if (firmware == null) throw "BTLEBlinkUp() requires Blueooth fimrware supplied as a string or blob.";
+        if (firmware == null) throw "BTLEBlinkUp() requires Blueooth firmware supplied as a string or blob.";
         _firmware = firmware;
 
         // Apply the BlinkUp service's UUIDs, or the defaults if none are provided
@@ -311,8 +311,8 @@ class BTLEBlinkUp {
             _blinking = true;
             for (local i = 0 ; i < _networks.len() ; i++) {
                 local network = _networks[i];
-                ns = ns + network["ssid"] + "\n";
-                ns = ns + (network["open"] ? "unlocked" : "locked") + "\n\n";
+                ns += (network["ssid"] + "\n");
+                ns += ((network["open"] ? "unlocked" : "locked") + "\n\n");
             }
             _blinking = false;
 
@@ -405,7 +405,7 @@ class BTLEBlinkUp {
         ab.writen(7, 'b');
         // Bytes 2+ — The UUID in little endian
         local maxs = ss.len() - 2;
-        for (local i = 0 ; i < maxs + 2 ; i = i + 2) {
+        for (local i = 0 ; i < maxs + 2 ; i += 2) {
             local bs = ss.slice(maxs - i, maxs - i + 2)
             ab.writen(_hexStringToInt(bs), 'b');
         }
@@ -416,9 +416,7 @@ class BTLEBlinkUp {
         // Byte 1 - The data type flag (0x09)
         ab.writen(9, 'b');
         // Bytes 2+ - The imp type as its name
-        foreach (ch in ns) {
-            ab.writen(ch, 'b');
-        }
+        foreach (ch in ns) ab.writen(ch, 'b');
 
         ble.startadvertise(ab, min, max);
     }
