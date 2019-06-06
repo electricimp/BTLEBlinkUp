@@ -60,7 +60,6 @@ class BTLEBlinkUp {
 
     // ********** Private instance properties **********
     _uuids = null;
-    _firmware = null;
     _blinkup = null;
     _incoming = null;
     _incomingCB = null;
@@ -88,7 +87,6 @@ class BTLEBlinkUp {
     constructor(uuids = null, firmware = null, lpoPin = null, regonPin = null, uart = null) {
         // Check that we have recieved firmware
         if (firmware == null) throw "BTLEBlinkUp() requires Blueooth firmware supplied as a string or blob.";
-        _firmware = firmware;
 
         // Apply the BlinkUp service's UUIDs, or the defaults if none are provided
         if (uuids == null || typeof uuids != "table" || uuids.len() != 8) throw "BTLEBlinkUp() requires service UUIDs to be provided as a table";
@@ -102,7 +100,7 @@ class BTLEBlinkUp {
         _uart = uart != null ? uart : hardware.uartFGJH;
 
         // Initialize the radio
-        _init();
+        _init(firmware);
     }
 
     /**
@@ -471,7 +469,7 @@ class BTLEBlinkUp {
      * @private
      *
      */
-    function _init() {
+    function _init(firmware) {
         // NOTE These require a suitably connected module - we can't check for that here
         _pin_LPO_IN.configure(DIGITAL_OUT, 0);
         _pin_BT_REG_ON.configure(DIGITAL_OUT, 1);
@@ -535,7 +533,7 @@ class BTLEBlinkUp {
 
         try {
             // Instantiate Bluetooth LE
-            ble = hardware.bluetooth.open(_uart, _firmware);
+            ble = hardware.bluetooth.open(_uart, firmware);
         } catch (err) {
             throw "BLE failed to initialize (error: " + err + ")";
         }
