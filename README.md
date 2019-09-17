@@ -6,6 +6,10 @@ The BTLEBlinkUp library is intended for Electric Imp customers **only**. It cont
 
 **To include this library in your project, add** `#require "bt_firmware.lib.nut:1.0.0"` **and** `#require "btleblinkup.device.lib.nut:1.0.0"` **at the top of your device code**.
 
+## Example Code ##
+
+Please see the repo [BluetoothBlinkUp](https://github.com/electricimp/BluetoothBlinkUp) for working iOS and Squirrel application code which makes use of this library.
+
 ## Class Usage ##
 
 ### Application Code Loading Time ###
