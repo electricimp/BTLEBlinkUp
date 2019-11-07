@@ -44,7 +44,7 @@ class BTLEBlinkUp {
      * @property {string} VERSION - The library version.
      *
     */
-    static VERSION = "1.0.0";
+    static VERSION = "2.0.0";
 
     /**
      * @property {imp::bluetooth} ble - The imp API hardware.bluetooth instance.
@@ -69,9 +69,11 @@ class BTLEBlinkUp {
     _uart = null;
     _blinking = false;
     _scanning = false;
+    _impType = null;
 
     /**
      * Instantiate the BLE BlinkUp Class.
+     * NOTE lpoPin, regonPin and uart only required by imp004m.
      *
      * @constructor
      *
@@ -93,11 +95,18 @@ class BTLEBlinkUp {
         if (!_checkUUIDs(uuids)) throw "BTLEBlinkUp() requires the service UUID table to contain specific key names";
         _uuids = uuids;
 
-        // Set the BLE radio pins, either to the passed in values, or the defaults
-        // Defaults to the imp004m Breakout Board
-        _pin_LPO_IN = lpoPin != null ? lpoPin : hardware.pinE;
-        _pin_BT_REG_ON = regonPin != null ? regonPin : hardware.pinJ;
-        _uart = uart != null ? uart : hardware.uartFGJH;
+        _impType = imp.info().type;
+        if (_impType == "imp004m") {
+            // Set the BLE radio pins, either to the passed in values, or the defaults
+            // Defaults to the imp004m Breakout Board
+            _pin_LPO_IN = lpoPin != null ? lpoPin : hardware.pinE;
+            _pin_BT_REG_ON = regonPin != null ? regonPin : hardware.pinJ;
+            _uart = uart != null ? uart : hardware.uartFGJH;
+        } else {
+            _pin_LPO_IN = null;
+            _pin_BT_REG_ON = null;
+            _uart = null;
+        }
 
         // Initialize the radio
         _init(firmware);
@@ -470,9 +479,12 @@ class BTLEBlinkUp {
      *
      */
     function _init(firmware) {
-        // NOTE These require a suitably connected module - we can't check for that here
-        _pin_LPO_IN.configure(DIGITAL_OUT, 0);
-        _pin_BT_REG_ON.configure(DIGITAL_OUT, 1);
+        // FROM 2.0.0, support imp006 by partitioning imp004m-specific settings
+        if (_impType == "imp004m") {
+            // NOTE These require a suitably connected module - we can't check for that here
+            _pin_LPO_IN.configure(DIGITAL_OUT, 0);
+            _pin_BT_REG_ON.configure(DIGITAL_OUT, 1);
+        }
 
         // Scan for WiFi networks around the device
         local now = hardware.millis();
@@ -533,7 +545,8 @@ class BTLEBlinkUp {
 
         try {
             // Instantiate Bluetooth LE
-            ble = hardware.bluetooth.open(_uart, firmware);
+            // FROM 2.0.0 - use separate calls for imp004m and imp006
+            ble = _impType == "imp004m" ? hardware.bluetooth.open(_uart, firmware) : hardware.bluetooth.open(firmware);
         } catch (err) {
             throw "BLE failed to initialize (error: " + err + ")";
         }
