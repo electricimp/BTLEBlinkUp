@@ -93,7 +93,7 @@ The *callback* function has a single parameter of its own into which a table is 
 
 | Key | Type | Notes |
 | --- | --- | --- |
-| *conn* | imp API BluetoothConnection instance | See [**hardware.bluetooth.onconnect()**](https://developer.electricimp.com/api/hardware/bluetooth/onconnect/) |
+| *conn* | imp API BluetoothConnection instance | See [**hardware.bluetooth.onconnect()**](https://developer.electricimp.com/api/hardware/bluetooth/onconnect) |
 | *address* | String | The hexadecimal address of the connecting device |
 | *security* | Integer | The security mode of the connection (1, 3 or 4) |
 | *state* | String | The state of the remote device: `"connected"` or `"disconnected"` |
@@ -145,7 +145,7 @@ agent.send("get.agent.url", true);
 
 ### setSecurity(*mode, pin*) ###
 
-This method applies the required security mode: 1, 3 or 4. For more information, please see [**hardware.bluetooth.setsecurity()**](https://developer.electricimp.com/api/hardware/bluetooth/setsecurity/). If any errors are encountered, eg. an incorrect security mode has been requested, the method will report the fact and set the security level to the default: no security. For this mode, no value need be passed into *pin*, but modes 3 and 4 both require the provision of a six-digit decimal PIN code for pairing. This can be a string or an integer.
+This method applies the required security mode: 1, 3 or 4. For more information, please see [**hardware.bluetooth.setsecurity()**](https://developer.electricimp.com/api/hardware/bluetooth/setsecurity). If any errors are encountered, eg. an incorrect security mode has been requested, the method will report the fact and set the security level to the default: no security. For this mode, no value need be passed into *pin*, but modes 3 and 4 both require the provision of a six-digit decimal PIN code for pairing. This can be a string or an integer.
 
 #### Parameters ####
 
@@ -258,7 +258,7 @@ The *callback* function has a single parameter of its own into which a table is 
 
 | Key | Type | Notes |
 | --- | --- | --- |
-| *conn* | imp API BluetoothConnection instance | See [**hardware.bluetooth.onconnect()**](https://developer.electricimp.com/api/hardware/bluetooth/onconnect/) |
+| *conn* | imp API BluetoothConnection instance | See [**hardware.bluetooth.onconnect()**](https://developer.electricimp.com/api/hardware/bluetooth/onconnect) |
 | *address* | String | The hexadecimal address of the connecting device |
 | *security* | Integer | The security mode of the connection (1, 3 or 4) |
 | *state* | String | The state of the remote device: `"connected"` or `"disconnected"` |
