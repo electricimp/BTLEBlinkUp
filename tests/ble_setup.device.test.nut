@@ -34,7 +34,7 @@ class BLESetupTestCase extends ImpTestCase {
 
         // Instantiate Bluetooth on a compatible device
         if (_isCompatible) {
-            _ble = BTLEBlinkUp(_initUUIDs(), (this._iType == "imp004m" ? BT_FIRMWARE.CYW_43438 : BT_FIRMWARE.CYW_43455));
+            _ble = this._iType == "imp004m" ? BTLEBlinkUp(_initUUIDs(), BT_FIRMWARE.CYW_43438) : BTLEBlinkUp(_initUUIDs());
 
             local result = (_ble != null);
             this.assertTrue(result, "BLEBlinkUp NOT running on " + this._iType);
