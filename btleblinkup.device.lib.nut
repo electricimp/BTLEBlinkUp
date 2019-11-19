@@ -27,6 +27,11 @@
 */
 const BTLE_BLINKUP_WIFI_SCAN_INTERVAL = 120;
 
+/**
+ * @constant {integer} BTLE_BLINKUP_MIN_IMPOS - The minimum version of impOS supported.
+ *
+*/
+const BTLE_BLINKUP_MIN_IMPOS = 41.24;
 
 /**
  * Squirrel class for providing BlinkUp services via Bluetooth LE on a compatible imp.
@@ -44,7 +49,7 @@ class BTLEBlinkUp {
      * @property {string} VERSION - The library version.
      *
     */
-    static VERSION = "2.0.0";
+    static VERSION = "3.0.0";
 
     /**
      * @property {imp::bluetooth} ble - The imp API hardware.bluetooth instance.
@@ -78,7 +83,7 @@ class BTLEBlinkUp {
      * @constructor
      *
      * @param {array}     uuids      - Table of UUID service values (see Read Me).
-     * @param {string}    [firmware] - The Bluetooth radio firmware.
+     * @param {string}    [firmware] - The Bluetooth radio firmware. Not required on imp006 with 41.24 and up
      * @param {imp::pin}  [lpoPin]   - The imp004m module pin object connected to the BLE modele's LPO pin. Default: hardware.pinE.
      * @param {imp::pin}  [regonPin] - The imp004m module pin object connected to the BLE modele's REG_ON pin. Default: hardware.pinJ.
      * @param {imp::uart} [uart]     - The configured imp004m UART bus to which the BLE module is connected. Default: hardware.uartFGJH.
@@ -87,26 +92,34 @@ class BTLEBlinkUp {
      *
      */
     constructor(uuids = null, firmware = null, lpoPin = null, regonPin = null, uart = null) {
-        // Check that we have recieved firmware
-        if (firmware == null) throw "BTLEBlinkUp() requires Blueooth firmware supplied as a string or blob.";
-
-        // Apply the BlinkUp service's UUIDs, or the defaults if none are provided
-        if (uuids == null || typeof uuids != "table" || uuids.len() != 8) throw "BTLEBlinkUp() requires service UUIDs to be provided as a table";
-        if (!_checkUUIDs(uuids)) throw "BTLEBlinkUp() requires the service UUID table to contain specific key names";
-        _uuids = uuids;
-
+        // Determine the imp we're running on
         _impType = imp.info().type;
+
         if (_impType == "imp004m") {
             // Set the BLE radio pins, either to the passed in values, or the defaults
             // Defaults to the imp004m Breakout Board
             _pin_LPO_IN = lpoPin != null ? lpoPin : hardware.pinE;
             _pin_BT_REG_ON = regonPin != null ? regonPin : hardware.pinJ;
             _uart = uart != null ? uart : hardware.uartFGJH;
+
+            // Check that we have recieved firmware
+            if (firmware == null) throw "BTLEBlinkUp() requires Blueooth firmware supplied as a string or blob.";
         } else {
-            _pin_LPO_IN = null;
-            _pin_BT_REG_ON = null;
-            _uart = null;
+            // FROM 3.0.0 -- check we're running on the right impOS for imp0056
+            try {
+                local version = imp.getsoftwareversion();
+                local pos = version.find("release");
+                local impOSVersion = version.slice(pos + 8, pos + 13).tofloat();
+                if (impOSVersion < BTLE_BLINKUP_MIN_IMPOS) throw "BTLEBlinkUp() 3.0.0 requires impOS™ " + BTLE_BLINKUP_MIN_IMPOS + " or above";
+            } catch (err) {
+                throw err;
+            }
         }
+
+        // Apply the BlinkUp service's UUIDs, or the defaults if none are provided
+        if (uuids == null || typeof uuids != "table" || uuids.len() != 8) throw "BTLEBlinkUp() requires service UUIDs to be provided as a table";
+        if (!_checkUUIDs(uuids)) throw "BTLEBlinkUp() requires the service UUID table to contain specific key names";
+        _uuids = uuids;
 
         // Initialize the radio
         _init(firmware);
@@ -546,7 +559,8 @@ class BTLEBlinkUp {
         try {
             // Instantiate Bluetooth LE
             // FROM 2.0.0 - use separate calls for imp004m and imp006
-            ble = _impType == "imp004m" ? hardware.bluetooth.open(_uart, firmware) : hardware.bluetooth.open(firmware);
+            // FROM 3.0.0 - don't pass in any firmware on imp006 (we have already checked we're on a supported impOS release)
+            ble = _impType == "imp004m" ? hardware.bluetooth.open(_uart, firmware) : hardware.bluetooth.open();
         } catch (err) {
             throw "BLE failed to initialize (error: " + err + ")";
         }

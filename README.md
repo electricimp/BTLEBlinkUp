@@ -1,10 +1,14 @@
-# BTLEBlinkUp 2.0.0 #
+# BTLEBlinkUp 3.0.0 #
 
 This library provides a foundation for activating end-user devices via Bluetooth LE on imp modules that support this wireless technology (currently imp004m and imp006 only) using BlinkUp™.
 
 The BTLEBlinkUp library is intended for Electric Imp customers **only**. It contains device-side Squirrel code which enables BlinkUp device activation using enrollment and WiFi credentials transmitted by a companion app running on a mobile device. The companion app must contain the [Electric Imp BlinkUp SDK](https://developer.electricimp.com/manufacturing/sdkdocs), use of which is authorized by API key. Only Electric Imp customers can be provided with a suitable BlinkUp API key. Code for the companion app is not part of this library, but iOS example code is [available separately](https://github.com/electricimp/BluetoothBlinkUp).
 
-**To include this library in your project, add** `#require "bt_firmware.lib.nut:1.0.0"` **and** `#require "btleblinkup.device.lib.nut:2.0.0"` **at the top of your device code**.
+> **Important** Version 3.0.0 of this library supports impOS™ 41.24 and upwards **only**. This is due to changes made to the imp API’s [**hardware.bluetooth**](https://developer.electricimp.com/api/hardware/bluetooth) object and the integration of imp006 Bluetooth modem firmware into impOS. BTLEBlinkUp 3.0.0 assumes that this modem firmware has already been loaded; previous versions of the library performed firmware loading manually. This is a *de facto* breaking change.
+
+> If you are not running impOS 41.24 or above, please use [BTLEBlinkUp 2.0.0](https://github.com/electricimp/BTLEBlinkUp/tree/v2.0.0).
+
+**To include this library in your project, add** `#require "btleblinkup.device.lib.nut:3.0.0"` **at the top of your device code**.
 
 ## Example Code ##
 
@@ -22,23 +26,22 @@ Please see [**How To Implement The Connected Factory Process**](https://develope
 
 ### Dependencies ###
 
-This library requires the separate library [Bluetooth Firmware](https://github.com/electricimp/BluetoothFirmware):
-
-```squirrel
-#require "bt_firmware.lib.nut:1.0.0"
-#require "btleblinkup.device.lib.nut:2.0.0"
-```
-
-One of the firmware versions included in [Bluetooth Firmware](https://github.com/electricimp/BluetoothFirmware) should then be included in your BTLEBlinkUp instantiation call:
+If you are working with the imp004m, this library requires the separate library [Bluetooth Firmware](https://github.com/electricimp/BluetoothFirmware) and the inclusion of a firmware version in your BTLEBlinkUp instantiation call:
 
 ```squirrel
 // For imp004m
+#require "bt_firmware.lib.nut:1.0.0"
+#require "btleblinkup.device.lib.nut:3.0.0"
+
 local bt = BTLEBlinkUp(serviceUUIDs, BT_FIRMWARE.CYW_43438);
 ```
 
+If you are working with the imp006, no firmware is required:
 ```squirrel
 // For imp006
-local bt = BTLEBlinkUp(serviceUUIDs, BT_FIRMWARE.CYW_43455);
+#require "btleblinkup.device.lib.nut:3.0.0"
+
+local bt = BTLEBlinkUp(serviceUUIDs);
 ```
 
 ### Constructor: BTLEBlinkUp(*uuids, firmware[, lpoPin][, regonPin][, uart]*) ###
@@ -53,7 +56,7 @@ local bt = BTLEBlinkUp(serviceUUIDs, BT_FIRMWARE.CYW_43455);
 | *regonPin* | imp **pin** object | No | The imp GPIO pin connected to the Bluetooth LE radio’s BT_REG_ON pin. Default: **hardware.pinJ** |
 | *uart* | imp **uart** object | No | The imp UART on which the imp’s Bluetooth radio is connected. Default: **hardware.uartFGJH** |
 
-**Note** The last three parameters are required only on the imp004m. imp006-based applications should not supply arguments to these parameters; indeed, they will be ignored if you do.
+**Note** The last four parameters are required **only on the imp004m**. imp006-based applications should not supply arguments to these parameters; indeed, they will be ignored if you do.
 
 #### BLE Service UUIDs ####
 
@@ -270,6 +273,8 @@ Nothing.
 
 ## Release Notes ##
 
+- 3.0.0
+    - Requires impOS 41.24 or above. Please use 2.0.0 with earlier versions of impOS.
 - 2.0.0
     - Support imp006.
 - 1.0.0
