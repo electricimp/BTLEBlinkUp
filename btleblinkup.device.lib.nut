@@ -31,7 +31,7 @@ const BTLE_BLINKUP_WIFI_SCAN_INTERVAL = 120;
  * @constant {integer} BTLE_BLINKUP_MIN_IMPOS - The minimum version of impOS supported.
  *
 */
-const BTLE_BLINKUP_MIN_IMPOS = 41.24;
+const BTLE_BLINKUP_MIN_IMPOS = 41.28;
 
 /**
  * Squirrel class for providing BlinkUp services via Bluetooth LE on a compatible imp.
