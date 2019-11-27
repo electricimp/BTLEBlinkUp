@@ -3,6 +3,8 @@
  * Configuration with enable pin
  */
 
+const BTLE_BLINKUP_MIN_IMPOS = 41.28;
+
 @include "github:electricimp/BluetoothFirmware/bt_firmware.lib.nut"
 @include "github:electricimp/BTLEBlinkUp/btleblinkup.device.lib.nut@develop"
 
@@ -11,15 +13,28 @@ class BLESetupTestCase extends ImpTestCase {
     _ble = null;
     _iType = null;
     _isCompatible = false;
+    _impOSVersion = "41";
 
-    /**
-     * Get the imp Type (impp04m or imp006)
-     */
     function setUp() {
+
+        // Get the impOS version
+        local version = imp.getsoftwareversion();
+        local pos = version.find("release");
+        _impOSVersion = version.slice(pos + 8, pos + 13).tofloat();
 
         // Get the test imp’s type and report
         _iType = imp.info().type;
-        this.info("Test running on an " + _iType);
+        this.info("Test running on an " + _iType + " (impOS " + _impOSVersion + ")");
+
+        if (_iType == "imp006") {
+            if (_impOSVersion < BTLE_BLINKUP_MIN_IMPOS) {
+                // Need to be running BTLEBlinkUp 2.0.0
+                this.assertTrue(BTLEBlinkUp.VERSION == "2.0.0", "Test run on imp006 with impOS < 41.28 -- test with BTLEBlinkUp 2.0.0");
+            } else {
+                // Need to be running BTLEBlinkUp 3.0.0
+                this.assertTrue(BTLEBlinkUp.VERSION == "3.0.0", "Test run on imp006 with impOS >= 41.28 -- test with BTLEBlinkUp 3.0.0");
+            }
+        }
 
         // Check that the imp is compatible
         _isCompatible = (_iType == "imp006" || _iType == "imp004m");
@@ -27,14 +42,11 @@ class BLESetupTestCase extends ImpTestCase {
         return "Test running on a compatible imp";
     }
 
-    /**
-     * Test sensor readout in async mode
-     */
     function testBLEInitReadout() {
 
         // Instantiate Bluetooth on a compatible device
         if (_isCompatible) {
-            _ble = this._iType == "imp004m" ? BTLEBlinkUp(_initUUIDs(), BT_FIRMWARE.CYW_43438) : BTLEBlinkUp(_initUUIDs());
+            _ble = this._iType == "imp004m" ? BTLEBlinkUp(_initUUIDs(), BT_FIRMWARE.CYW_43438) : (_impOSVersion < BTLE_BLINKUP_MIN_IMPOS ? BTLEBlinkUp(_initUUIDs(), BT_FIRMWARE.CYW_43455) : BTLEBlinkUp(_initUUIDs()));
 
             local result = (_ble != null);
             this.assertTrue(result, "BLEBlinkUp NOT running on " + this._iType);
