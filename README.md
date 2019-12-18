@@ -277,7 +277,7 @@ Nothing.
 - 3.0.0
     - Requires impOS 41.28 or above. Please use 2.0.0 with earlier versions of impOS.
 - 2.0.0
-    - Support imp006.
+    - Initial imp006 support.
 - 1.0.0
     - Initial public release.
 
