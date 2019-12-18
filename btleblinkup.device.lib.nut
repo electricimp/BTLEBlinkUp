@@ -118,7 +118,7 @@ class BTLEBlinkUp {
                 throw err;
             }
         } else {
-            throw format("BTLEBlinkUp() supports imp004m or imp006";
+            throw "BTLEBlinkUp() supports imp004m or imp006";
         }
 
         // Apply the BlinkUp service's UUIDs, or the defaults if none are provided
