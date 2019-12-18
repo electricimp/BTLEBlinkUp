@@ -1,14 +1,10 @@
-# BTLEBlinkUp 3.0.0 #
+# BTLEBlinkUp 2.1.0 #
 
 This library provides a foundation for activating end-user devices via Bluetooth LE on imp modules that support this wireless technology (currently imp004m and imp006 only) using BlinkUp™.
 
 The BTLEBlinkUp library is intended for Electric Imp customers **only**. It contains device-side Squirrel code which enables BlinkUp device activation using enrollment and WiFi credentials transmitted by a companion app running on a mobile device. The companion app must contain the [Electric Imp BlinkUp SDK](https://developer.electricimp.com/manufacturing/sdkdocs), use of which is authorized by API key. Only Electric Imp customers can be provided with a suitable BlinkUp API key. Code for the companion app is not part of this library, but iOS example code is [available separately](https://github.com/electricimp/BluetoothBlinkUp).
 
-> **Important** Version 3.0.0 of this library supports impOS™ 41.28 and upwards **only**. This is due to changes made to the imp API’s [**hardware.bluetooth**](https://developer.electricimp.com/api/hardware/bluetooth) object and the integration of imp006 Bluetooth modem firmware into impOS. BTLEBlinkUp 3.0.0 assumes that this modem firmware has already been loaded; previous versions of the library performed firmware loading manually. This is a *de facto* breaking change.
-
-> If you are not running impOS 41.28 or above, please use [BTLEBlinkUp 2.0.0](https://github.com/electricimp/BTLEBlinkUp/tree/v2.0.0).
-
-**To include this library in your project, add** `#require "btleblinkup.device.lib.nut:3.0.0"` **at the top of your device code**.
+**To include this library in your project, add** `#require "btleblinkup.device.lib.nut:2.1.0"` **at the top of your device code**.
 
 ## Example Code ##
 
@@ -31,16 +27,26 @@ If you are working with the imp004m, this library requires the separate library 
 ```squirrel
 // For imp004m
 #require "bt_firmware.lib.nut:1.0.0"
-#require "btleblinkup.device.lib.nut:3.0.0"
+#require "btleblinkup.device.lib.nut:2.1.0"
 
 local bt = BTLEBlinkUp(serviceUUIDs, BT_FIRMWARE.CYW_43438);
 ```
 
-If you are working with the imp006, no firmware is required:
+If you are working with the imp006, firmware is only required required for impOS 41.27 or under:
 
 ```squirrel
-// For imp006
-#require "btleblinkup.device.lib.nut:3.0.0"
+// For imp006 on impOS 41.11
+#require "bt_firmware.lib.nut:1.0.0"
+#require "btleblinkup.device.lib.nut:2.1.0"
+
+local bt = BTLEBlinkUp(serviceUUIDs, BT_FIRMWARE.CYW_43455);
+```
+
+If you are working with the imp006 and all subsequent versions of impOS, including the production-ready impOS 42, you do not need to load firmware:
+
+```squirrel
+// For imp006 on impOS 42
+#require "btleblinkup.device.lib.nut:2.1.0"
 
 local bt = BTLEBlinkUp(serviceUUIDs);
 ```
@@ -274,8 +280,8 @@ Nothing.
 
 ## Release Notes ##
 
-- 3.0.0
-    - Requires impOS 41.28 or above. Please use 2.0.0 with earlier versions of impOS.
+- 2.1.0
+    - Updated to support imp API changes for imp006 (see [**Dependencies**](#dependencies), above).
 - 2.0.0
     - Initial imp006 support.
 - 1.0.0

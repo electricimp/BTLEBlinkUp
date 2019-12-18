@@ -49,7 +49,7 @@ class BTLEBlinkUp {
      * @property {string} VERSION - The library version.
      *
     */
-    static VERSION = "3.0.0";
+    static VERSION = "2.1.0";
 
     /**
      * @property {imp::bluetooth} ble - The imp API hardware.bluetooth instance.
@@ -75,6 +75,7 @@ class BTLEBlinkUp {
     _blinking = false;
     _scanning = false;
     _impType = null;
+    _version = null;
 
     /**
      * Instantiate the BLE BlinkUp Class.
@@ -103,17 +104,21 @@ class BTLEBlinkUp {
             _uart = uart != null ? uart : hardware.uartFGJH;
 
             // Check that we have recieved firmware
-            if (firmware == null) throw "BTLEBlinkUp() requires Blueooth firmware supplied as a string or blob.";
-        } else {
-            // FROM 3.0.0 -- check we're running on the right impOS for imp0056
+            if (firmware == null) throw "BTLEBlinkUp() requires Bluetooth firmware supplied as a string or blob for imp004m.";
+        } else if (_impType == "imp006"){
+            // FROM 2.1.0 -- check we're running on the right impOS for imp006
             try {
                 local version = imp.getsoftwareversion();
                 local pos = version.find("release");
-                local impOSVersion = version.slice(pos + 8, pos + 13).tofloat();
-                if (impOSVersion < BTLE_BLINKUP_MIN_IMPOS) throw "BTLEBlinkUp() 3.0.0 requires impOS™ " + BTLE_BLINKUP_MIN_IMPOS + " or above";
+                _version = version.slice(pos + 8, pos + 13).tofloat();
+
+                // No firmware? Thow on impOS less than min.
+                if (firmware == null && _version < BTLE_BLINKUP_MIN_IMPOS) throw format("BTLEBlinkUp() requires Bluetooth firmware supplied as a string or blob for imp006 on impOS undeer %.2f", BTLE_BLINKUP_MIN_IMPOS);
             } catch (err) {
                 throw err;
             }
+        } else {
+            throw format("BTLEBlinkUp() supports imp004m or imp006";
         }
 
         // Apply the BlinkUp service's UUIDs, or the defaults if none are provided
@@ -558,9 +563,16 @@ class BTLEBlinkUp {
 
         try {
             // Instantiate Bluetooth LE
-            // FROM 2.0.0 - use separate calls for imp004m and imp006
-            // FROM 3.0.0 - don't pass in any firmware on imp006 (we have already checked we're on a supported impOS release)
-            ble = _impType == "imp004m" ? hardware.bluetooth.open(_uart, firmware) : hardware.bluetooth.open();
+            // FROM 2.1.0 - use separate calls for imp004m and imp006 because of different bluetooth.open() parameter lists
+            if (_impType == "imp004m") {
+                ble = hardware.bluetooth.open(_uart, firmware);
+            } else if (_impType == "imp006") {
+                if (_version < BTLE_BLINKUP_MIN_IMPOS) {
+                    ble = hardware.bluetooth.open(firmware);
+                } else {
+                    ble = hardware.bluetooth.open();
+                }
+            }
         } catch (err) {
             throw "BLE failed to initialize (error: " + err + ")";
         }
