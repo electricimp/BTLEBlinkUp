@@ -32,20 +32,9 @@ If you are working with the imp004m, this library requires the separate library 
 local bt = BTLEBlinkUp(serviceUUIDs, BT_FIRMWARE.CYW_43438);
 ```
 
-If you are working with the imp006, firmware is only required required for impOS 41.27 or under:
+If you are working with the imp006, firmware is not required with impOS 42 or above:
 
 ```squirrel
-// For imp006 on impOS 41.11
-#require "bt_firmware.lib.nut:1.0.0"
-#require "btleblinkup.device.lib.nut:2.1.0"
-
-local bt = BTLEBlinkUp(serviceUUIDs, BT_FIRMWARE.CYW_43455);
-```
-
-If you are working with the imp006 and all subsequent versions of impOS, including the production-ready impOS 42, you do not need to load firmware:
-
-```squirrel
-// For imp006 on impOS 42
 #require "btleblinkup.device.lib.nut:2.1.0"
 
 local bt = BTLEBlinkUp(serviceUUIDs);

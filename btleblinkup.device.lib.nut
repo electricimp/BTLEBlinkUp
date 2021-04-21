@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2019 Electric Imp, Inc.
+// Copyright (c) 2021 Twilio.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -113,7 +113,7 @@ class BTLEBlinkUp {
                 _version = version.slice(pos + 8, pos + 13).tofloat();
 
                 // No firmware? Thow on impOS less than min.
-                if (firmware == null && _version < BTLE_BLINKUP_MIN_IMPOS) throw format("BTLEBlinkUp() requires Bluetooth firmware supplied as a string or blob for imp006 on impOS undeer %.2f", BTLE_BLINKUP_MIN_IMPOS);
+                if (firmware == null && _version < BTLE_BLINKUP_MIN_IMPOS) throw format("BTLEBlinkUp() requires Bluetooth firmware supplied as a string or blob for imp006 on impOS under %.2f", BTLE_BLINKUP_MIN_IMPOS);
             } catch (err) {
                 throw err;
             }

@@ -2,9 +2,8 @@
  * BLEBlinkUp Library test cases
  *
  */
-
 @include "github:electricimp/BluetoothFirmware/bt_firmware.lib.nut"
-@include "github:electricimp/BTLEBlinkUp/btleblinkup.device.lib.nut@develop"
+
 
 class BLESetupTestCase extends ImpTestCase {
 
@@ -17,32 +16,23 @@ class BLESetupTestCase extends ImpTestCase {
      */
     function setUp() {
 
+        this.info("BTLEBlinkUp library version " + BTLEBlinkUp.VERSION);
+
         // Get the test imp’s type and report
         _iType = imp.info().type;
-        this.info("Test running on an " + _iType);
+        this.info("Tests running on an " + _iType);
 
         // Check that the imp is compatible
         _isCompatible = (_iType == "imp006" || _iType == "imp004m");
-        this.assertTrue(_isCompatible, "Test run on an incompatible imp");
-        return "Test running on a compatible imp";
-    }
+        this.assertTrue(_isCompatible, "Tests attempted on an incompatible imp");
+        this.info("Tests running on a compatible imp");
 
-    /**
-     * Test sensor readout in async mode
-     */
-    function testBLEInitReadout() {
+        // Instatiate the class
+        _ble = BTLEBlinkUp(_initUUIDs(), (this._iType == "imp004m" ? BT_FIRMWARE.CYW_43438 : BT_FIRMWARE.CYW_43455));
 
-        // Instantiate Bluetooth on a compatible device
-        if (_isCompatible) {
-            _ble = BTLEBlinkUp(_initUUIDs(), (this._iType == "imp004m" ? BT_FIRMWARE.CYW_43438 : BT_FIRMWARE.CYW_43455));
-
-            local result = (_ble != null);
-            this.assertTrue(result, "BLEBlinkUp NOT running on " + this._iType);
-            return "BLEBlinkUp running";
-        }
-
-        this.assertTrue(_isCompatible, "Test run on an incompatible imp");
-        return;
+        local result = (_ble != null);
+        this.assertTrue(result, "BLE BlinkUp NOT running on " + this._iType);
+        return "BLE BlinkUp running";
     }
 
     // Auxilliary funtion to set the GATT service UUIDs we wil use
