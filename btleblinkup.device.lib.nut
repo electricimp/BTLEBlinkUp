@@ -76,6 +76,7 @@ class BTLEBlinkUp {
     _scanning = false;
     _impType = null;
     _version = null;
+    _conn = null;
 
     /**
      * Instantiate the BLE BlinkUp Class.
@@ -261,7 +262,7 @@ class BTLEBlinkUp {
         chrx.write <- function(conn, v) {
             _blinkup.ssid = v.tostring();
             _blinkup.updated = true;
-            server.log("WiFi SSID set");
+            _reportGatt({"service":_uuids.blinkup_service_uuid, "characteristic":_uuids.ssid_setter_uuid});
             return 0x0000;
         }.bindenv(this);
         service.chars.append(chrx);
@@ -272,7 +273,7 @@ class BTLEBlinkUp {
         chrx.write <- function(conn, v) {
             _blinkup.pwd = v.tostring();
             _blinkup.updated = true;
-            server.log("WiFi password set");
+            _reportGatt({"service":_uuids.blinkup_service_uuid, "characteristic":_uuids.password_setter_uuid});
             return 0x0000;
         }.bindenv(this);
         service.chars.append(chrx);
@@ -283,7 +284,7 @@ class BTLEBlinkUp {
         chrx.write <- function(conn, v) {
             _blinkup.planid = v.tostring();
             _blinkup.updated = true;
-            server.log("Plan ID set");
+            _reportGatt({"service":_uuids.blinkup_service_uuid, "characteristic":_uuids.planid_setter_uuid});
             return 0x0000;
         }.bindenv(this);
         service.chars.append(chrx);
@@ -294,7 +295,7 @@ class BTLEBlinkUp {
         chrx.write <- function(conn, v) {
             _blinkup.token = v.tostring();
             _blinkup.updated = true;
-            server.log("Enrolment Token set");
+            _reportGatt({"service":_uuids.blinkup_service_uuid, "characteristic":_uuids.token_setter_uuid});
             return 0x0000;
         }.bindenv(this);
         service.chars.append(chrx);
@@ -304,7 +305,7 @@ class BTLEBlinkUp {
         chrx.uuid <- _uuids.blinkup_trigger_uuid;
         chrx.write <- function(conn, v) {
             if (_blinkup.updated) {
-                server.log("Device Activation triggered");
+                _reportGatt({"service":_uuids.blinkup_service_uuid, "characteristic":_uuids.blinkup_trigger_uuid});
                 _blinkup.update();
                 return 0x0000;
             } else {
@@ -317,7 +318,7 @@ class BTLEBlinkUp {
         chrx = {};
         chrx.uuid <- _uuids.wifi_clear_trigger_uuid;
         chrx.write <- function(conn, v) {
-            server.log("Device WiFi clearance triggered");
+            _reportGatt({"service":_uuids.blinkup_service_uuid, "characteristic":_uuids.wifi_clear_trigger_uuid});
             _blinkup.clear();
             return 0x0000;
         }.bindenv(this);
@@ -331,7 +332,7 @@ class BTLEBlinkUp {
             // Networks are stored as "ssid[newline]open/secure[newline][newline]"
             // NOTE set _blinking to true so we don't asynchronously update the list
             //      of networks while also using it here
-            server.log("Sending WLAN list to app");
+            _reportGatt({"service":_uuids.blinkup_service_uuid, "characteristic":_uuids.wifi_getter_uuid});
             local ns = "";
             _blinking = true;
             for (local i = 0 ; i < _networks.len() ; i++) {
@@ -605,6 +606,24 @@ class BTLEBlinkUp {
                        "state":    "connected" };
 
         // Call the host app's onconnect handler
+        _incomingCB(data);
+    }
+
+    /**
+     * GATT reporter function
+     *
+     * It reports GATT accesses to the onConnect callback, if one
+     * has been regisered.
+     *
+     * @private
+     *
+     * @param {table} gatt - GATT information with the keys 'service' and
+     *                       'characteristic'. Values are the UUIDS.
+     *
+     */
+    function _reportGatt(gatt) {
+        if (_incomingCB == null) return;
+        local data = {"gatt": gatt};
         _incomingCB(data);
     }
 

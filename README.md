@@ -88,7 +88,7 @@ This method provides the easiest way to provide BlinkUp via Bluetooth LE. It boo
 | *advert* | String or blob | No | The imp’s Bluetooth LE advertisement payload, up to 31 bytes in length. If you do not specify a payload, the library generates one for you using the BlinkUp service UUID (default or supplied) and the type of imp module as a device name string (eg. `imp004m`) |
 | *callback* | Function | No | A function which will be triggered when a remote device connects to the imp, or actively disconnects from it |
 
-The *callback* function has a single parameter of its own into which a table is passed containing any of the following keys:
+The *callback* function has a single parameter of its own into which a table is passed containing the following keys when connections are made or ended:
 
 | Key | Type | Notes |
 | --- | --- | --- |
@@ -96,6 +96,17 @@ The *callback* function has a single parameter of its own into which a table is 
 | *address* | String | The hexadecimal address of the connecting device |
 | *security* | Integer | The security mode of the connection (1, 3 or 4) |
 | *state* | String | The state of the remote device: `"connected"` or `"disconnected"` |
+
+If a GATT event is being reported, only these keys will be present:
+
+| Key | Type | Notes |
+| --- | --- | --- |
+| *gatt*  | Table | If the connection was caused by a GATT event, a table with the keys *service* and *characteristic* with UUIDs as values; otherwise `null` |
+
+If an error is being reported, only these keys will be present:
+
+| Key | Type | Notes |
+| --- | --- | --- |
 | *error* | String | In the event of an error, a description of the error; otherwise `null` |
 
 #### Return Value ####
@@ -271,6 +282,8 @@ Nothing.
 
 - 2.1.0
     - Updated to support imp API changes for imp006 (see [**Dependencies**](#dependencies), above).
+    - Added GATT event reporting to *listenForBlinkUp()*.
+    - Removed various *server.log()* calls.
 - 2.0.0
     - Initial imp006 support.
 - 1.0.0
