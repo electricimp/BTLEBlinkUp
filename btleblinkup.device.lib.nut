@@ -383,38 +383,40 @@ class BTLEBlinkUp {
      * @param {integer}     [max]  - Optional maximum interval in ms. Default: 100.
      * @param {integer}     [min]  - Optional minimum interval in ms. Default: 100.
      *
+     * @returns {boolean} Whether advertising was successfully begin
+     *
      */
     function advertise(advert = null, min = 100, max = 100) {
         // Check for a valid Bluetooth instance
         if (ble == null) {
             server.error("BTLEBlinkUp.advertise() - Bluetooth LE not initialized");
-            return;
+            return false;
         }
 
         // Check the 'min' and 'max' values
         if (min < 0 || min > 100) min = 100;
         if (max < 0 || max > 100) max = 100;
         if (min > max) {
-          // Swap 'min' and 'max' around if 'min' is bigger than 'max'
-          local a = max;
-          max = min;
-          min = a;
+            // Swap 'min' and 'max' around if 'min' is bigger than 'max'
+            local a = max;
+            max = min;
+            min = a;
         }
 
         // Advertise the supplied advert then exit
         if (advert != null) {
-            if (typeof advert != "blob" && typeof advert != "string") {
+            if ((typeof advert != "blob") && (typeof advert != "string")) {
                 server.error("BTLEBlinkUp.advertise() - Misformed advertisement provided");
-                return;
+                return false;
             }
 
             if (advert.len() > 31) {
                 server.error("BTLEBlinkUp.advertise() - Advertisement data too long (31 bytes max.)");
-                return;
+                return false;
             }
 
             ble.startadvertise(advert, min, max);
-            return;
+            return true;
         }
 
         // Otherwise build the advert packed based on the service UUID
@@ -445,6 +447,20 @@ class BTLEBlinkUp {
         foreach (ch in ns) ab.writen(ch, 'b');
 
         ble.startadvertise(ab, min, max);
+        return true;
+    }
+
+    /**
+     * Close down BLE conventience method
+     *
+     */
+    function close() {
+        if (ble != null) {
+            ble.stopadvertise();
+            ble.servegatt([]);
+            ble.close();
+            ble = null;
+        }
     }
 
     /**
@@ -563,7 +579,7 @@ class BTLEBlinkUp {
         if (now < 10) imp.sleep((10 - now) / 1000);
 
         try {
-            // Instantiate Bluetooth LE
+            // Instantiate BLE
             // FROM 2.1.0 - use separate calls for imp004m and imp006 because of different bluetooth.open() parameter lists
             if (_impType == "imp004m") {
                 ble = hardware.bluetooth.open(_uart, firmware);
@@ -656,7 +672,7 @@ class BTLEBlinkUp {
      *
      * @private
      *
-     * @param {string} hs - A string in hexadecimal format.
+     * @param {string} hs - A string (without 0x prefix) in hexadecimal format.
      *
      * @returns {integer} The integer that that source string represents.
      *
@@ -729,7 +745,7 @@ class BTLEBlinkUp {
                          "wifi_getter_uuid", "wifi_clear_trigger_uuid"];
         local got = 0;
         foreach (key in keyList) {
-            if (uuids[key].len() != null) got++;
+            if (key in uuids && uuids[key].len() != null) got++;
         }
         return got == 8 ? true : false;
     }
