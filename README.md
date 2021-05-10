@@ -239,7 +239,7 @@ This method advertises the imp to other Bluetooth LE-enabled devices using the a
 
 #### Return Value ####
 
-Nothing.
+Boolean — `true` if adverting began successfully, otherwise `false`.
 
 #### Example ####
 
@@ -250,6 +250,26 @@ bt.setSecurity(1);
 bt.serve();
 bt.advertise(advert, 90, 110);
 server.log("Bluetooth running...");
+```
+
+### close() ###
+
+This method stops advertising, disables BLE and nulls an instance’s *ble* property. Call this method to stop using BLE for BlinkUp.
+
+**Note** *advertise()* is called implicitly by [*listenForBlinkUp()*](#listenforblinkupadvert-callback).
+
+#### Return Value ####
+
+Nothing.
+
+#### Example ####
+
+```squirrel
+// Stop listening for BlinkUp signals after 5 mins (300s)
+imp.wakeup(300, function() {
+    bt.close();
+    server.log("BlinkUp no longer available - restart the device to re-enable.");
+});
 ```
 
 ### onConnect(*[callback]*) ###
@@ -283,7 +303,9 @@ Nothing.
 - 2.1.0
     - Updated to support imp API changes for imp006 (see [**Dependencies**](#dependencies), above).
     - Added GATT event reporting to *listenForBlinkUp()*.
+    - Added *close()* function.
     - Removed various *server.log()* calls.
+    - Updated code to deal with test-revealed issues.
 - 2.0.0
     - Initial imp006 support.
 - 1.0.0
