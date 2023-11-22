@@ -3,7 +3,7 @@
  *
  */
 @include "github:electricimp/BluetoothFirmware/bt_firmware.lib.nut"
-
+@include "btleblinkup.device.lib.nut"
 
 class BLESetupTestCase extends ImpTestCase {
 

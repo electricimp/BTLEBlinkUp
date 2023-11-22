@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2021 Twilio.
+// Copyright (c) 2023 KORE Wireless.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -578,6 +578,7 @@ class BTLEBlinkUp {
         now = hardware.millis() - now;
         if (now < 10) imp.sleep((10 - now) / 1000);
 
+        now = hardware.millis();
         try {
             // Instantiate BLE
             // FROM 2.1.0 - use separate calls for imp004m and imp006 because of different bluetooth.open() parameter lists
@@ -591,7 +592,7 @@ class BTLEBlinkUp {
                 }
             }
         } catch (err) {
-            throw "BLE failed to initialize (error: " + err + ")";
+            throw "BLE failed to initialize (error: " + err + ") after " + (hardware.millis() - set) + " ms";
         }
     }
 
