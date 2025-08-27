@@ -26,7 +26,7 @@ This library requires the separate library [Bluetooth Firmware](https://github.c
 
 ```squirrel
 #require "bt_firmware.lib.nut:1.0.0"
-#require "btleblinkup.device.lib.nut:2.0.0"
+#require "btleblinkup.device.lib.nut:2.0.1"
 ```
 
 One of the firmware versions included in [Bluetooth Firmware](https://github.com/electricimp/BluetoothFirmware) should then be included in your BTLEBlinkUp instantiation call:

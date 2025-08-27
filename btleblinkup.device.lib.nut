@@ -44,7 +44,7 @@ class BTLEBlinkUp {
      * @property {string} VERSION - The library version.
      *
     */
-    static VERSION = "2.0.0";
+    static VERSION = "2.0.1";
 
     /**
      * @property {imp::bluetooth} ble - The imp API hardware.bluetooth instance.
@@ -546,7 +546,7 @@ class BTLEBlinkUp {
         try {
             // Instantiate Bluetooth LE
             // FROM 2.0.0 - use separate calls for imp004m and imp006
-            ble = _impType == "imp004m" ? hardware.bluetooth.open(_uart, firmware) : hardware.bluetooth.open(firmware);
+            ble = _impType == "imp004m" ? hardware.bluetooth.open(_uart, firmware) : hardware.bluetooth.open();
         } catch (err) {
             throw "BLE failed to initialize (error: " + err + ")";
         }
