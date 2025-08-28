@@ -1,10 +1,10 @@
-# BTLEBlinkUp 2.0.0 #
+# BTLEBlinkUp 2.0.1 #
 
 This library provides a foundation for activating end-user devices via Bluetooth LE on imp modules that support this wireless technology (currently imp004m and imp006 only) using BlinkUp™.
 
 The BTLEBlinkUp library is intended for Electric Imp customers **only**. It contains device-side Squirrel code which enables BlinkUp device activation using enrollment and WiFi credentials transmitted by a companion app running on a mobile device. The companion app must contain the [Electric Imp BlinkUp SDK](https://developer.electricimp.com/manufacturing/sdkdocs), use of which is authorized by API key. Only Electric Imp customers can be provided with a suitable BlinkUp API key. Code for the companion app is not part of this library, but iOS example code is [available separately](https://github.com/electricimp/BluetoothBlinkUp).
 
-**To include this library in your project, add** `#require "bt_firmware.lib.nut:1.0.0"` **and** `#require "btleblinkup.device.lib.nut:2.0.0"` **at the top of your device code**.
+**To include this library in your project, add** `#require "bt_firmware.lib.nut:1.0.0"` **and** `#require "btleblinkup.device.lib.nut:2.0.1"` **at the top of your device code**.
 
 ## Example Code ##
 
@@ -269,7 +269,8 @@ The *callback* function has a single parameter of its own into which a table is 
 Nothing.
 
 ## Release Notes ##
-
+- 2.0.1
+    - Bug fix in imp006.
 - 2.0.0
     - Support imp006.
 - 1.0.0
